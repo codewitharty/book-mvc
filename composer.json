@@ -1,0 +1,12 @@
+{
+  "name": "whoosh/website",
+  "autoload": {
+    "psr-4": {
+      "App\\": "app",
+      "Framework\\": "framework"
+    }
+  },
+  "config": {
+    "process-timeout": 0
+  }
+}
