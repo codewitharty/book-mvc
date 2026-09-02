@@ -64,6 +64,7 @@ class Router
                 // Attempt to execute the handler function of the matched route. This action might throw an exception if the handler fails internally.
                 return $matching->dispatch(); // Return the result from the successful route dispatch.
             } catch (Throwable $e) {
+                return $e;
                 // If any Throwable (Exception or Error) occurs during dispatch, we catch it here instead of letting it crash the application immediately.
                 return $this->dispatchError(); // Delegate error handling to our global 500 handler.
             }
