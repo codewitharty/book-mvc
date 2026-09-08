@@ -2,6 +2,9 @@
 
 namespace Framework\View\Engine;
 
+use Framework\View\Manager;
+use Framework\View\View;
+
 /**
  * Interface Engine
  * ------------------
@@ -14,9 +17,9 @@ interface Engine
     /**
      * Renders a specific template file using the engine's logic.
      *
-     * @param string $path The full path to the template file (e.g., /views/home.php).
-     * @param array $data An associative array of data to inject into the template.
+     * @param View $view
      * @return string The fully rendered content of the template as a string (usually HTML).
      */
-    public function render(string $path, array $data = []): string;
+    public function render(View $view): string;
+    public function setManager(Manager $manager): static;
 }

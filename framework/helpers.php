@@ -13,6 +13,9 @@ use Framework\View;
  * @return string The final rendered content of the template.
  */
 if (!function_exists('view')) {
+    /**
+     * @throws Exception
+     */
     function view(string $template, array $data = []): string
     {
         static $manager; // The persistent system object that remembers its setup!
@@ -30,9 +33,11 @@ if (!function_exists('view')) {
             // We are telling the Manager: "If you see a '.basic.php' file, use BasicEngine!"
             $manager->addEngine('basic.php', new View\Engine\BasicEngine());
             $manager->addEngine('php', new View\Engine\PhpEngine());
+
+            $manager->addMacro('escape', fn($value) => htmlspecialchars($value));
         }
 
-        // 4. Delegate the work! Ask the persistent Manager to handle the rendering.
-        return $manager->render($template, $data);
+        // 4. Delegate the work! Ask the persistent Manager to resolve the template.
+        return $manager->resolve($template, $data);
     }
 }

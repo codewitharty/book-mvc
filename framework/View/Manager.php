@@ -2,8 +2,10 @@
 
 namespace Framework\View;
 
+use Closure;
 use Exception;
 use Framework\View\Engine\Engine;
+use Framework\View\Engine\HasMacro;
 
 /**
  * Manager (The View Orchestrator)
@@ -13,6 +15,10 @@ use Framework\View\Engine\Engine;
  */
 class Manager
 {
+
+    // Enables macro registration/execution (useful if Manager needs to handle macros directly)
+    use HasMacro;
+
     /**
      * @var array Stores all configured directories where views reside (e.g., ['/app/views', '/admin/views']).
      */
@@ -46,18 +52,22 @@ class Manager
     public function addEngine(string $extension, Engine $engine): static
     {
         $this->engines[$extension] = $engine;
+        $this->engines[$extension]->setManager($this);
         return $this; // Return 'static' (the current object)
     }
 
     /**
-     * Attempts to render a template by checking all registered paths against all registered engines.
+     * Locates and prepares a template for rendering.
+     * -----------------------------------------
+     * This method searches all configured paths across all registered engines to find the matching view file.
+     * Once found, it instantiates and returns a View object ready to be rendered by its associated engine.
      *
-     * @param string $template The name of the template file (e.g., 'home').
-     * @param array $data Data to inject into the template during rendering.
-     * @return string The final rendered HTML content.
-     * @throws Exception If no matching template/engine combination is found.
+     * @param string $template The base name of the template (e.g., 'homepage', 'user_profile').
+     * @param array $data Associative data array containing variables to inject into the view.
+     * @return View Returns a fully configured View object, ready to be rendered by its engine.
+     * @throws Exception If no matching file can be found across all paths and extensions.
      */
-    public function render(string $template, array $data = []): string
+    public function resolve(string $template, array $data = []): string
     {
         // Loop through every registered engine (e.g., BasicEngine, PhpEngine)
         foreach ($this->engines as $extension => $engine) {
@@ -69,12 +79,12 @@ class Manager
                 // Check if a file actually exists at this location!
                 if (is_file($file)) {
                     // Found it! Delegate the rendering job to this specific engine instance.
-                    return $engine->render($file, $data);
+                    return new View($engine, realpath($file), $data);
                 }
             }
         }
 
         // If the loops complete without finding a match, throw an error.
-        throw new Exception("Unable to render template '{$template}'. Check paths and extensions.");
+        throw new Exception("Could not resolve template '{$template}'. Check paths and extensions.");
     }
 }
