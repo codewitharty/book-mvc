@@ -30,7 +30,7 @@ class BasicEngine implements Engine
         foreach ($view->data as $key => $value) {
             // 3. Replace placeholders in the format "{ key }" with the actual value.
             $contents = str_replace(
-                "{ $key }", $value, $contents
+                "{$key}", $value, $contents
             );
         }
 

@@ -32,9 +32,11 @@ if (!function_exists('view')) {
             // 3. Configure Engines: Register specific rendering tools against extensions.
             // We are telling the Manager: "If you see a '.basic.php' file, use BasicEngine!"
             $manager->addEngine('basic.php', new View\Engine\BasicEngine());
+            $manager->addEngine('advanced.php', new View\Engine\AdvancedEngine());
             $manager->addEngine('php', new View\Engine\PhpEngine());
 
             $manager->addMacro('escape', fn($value) => htmlspecialchars($value));
+            $manager->addMacro('includes', fn(...$params) => print view(...$params));
         }
 
         // 4. Delegate the work! Ask the persistent Manager to resolve the template.
