@@ -82,8 +82,14 @@ class AdvancedEngine implements Engine
             return '<?php print $this->escape("' . $matches[1] . '"); ?>';
         }, $template);
 
+        // Replace `{!! ... !!}` with `print ...`
         $template = preg_replace_callback('#\{!!([^}]+)!!\}#', function ($matches) {
             return '<?php print "' . $matches[1] . '"; ?>';
+        }, $template);
+
+        // Replace `@***(...)` with `print $this->***(...)`
+        $template = preg_replace_callback('#@([^(]+)\(((?<=\().*(?=\)))\)#', function($matches) {
+            return '<?php $this->' . $matches[1] . '(' . $matches[2] . '); ?>';
         }, $template);
 
         return $template;
