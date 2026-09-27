@@ -29,6 +29,10 @@ class AdvancedEngine implements Engine
         $hash = md5($view->path);
         $folder = __DIR__ . '/../../../storage/framework/views';
 
+        if (!is_dir($folder)) {
+            mkdir($folder, 0777, true);
+        }
+
         if (!is_file("{$folder}/{$hash}.php")) {
             touch("{$folder}/{$hash}.php");
         }
@@ -61,6 +65,25 @@ class AdvancedEngine implements Engine
         // Replace `@extends` with `$this->extends`
         $template = preg_replace_callback('#@extends\(([^)]+)\)#', function ($matches) {
             return '<?php $this->extends(' . $matches[1] . '); ?>';
+        }, $template);
+
+        // Replace `@id` with `if(...):`
+        $template = preg_replace_callback('#@if\(([^)]+)\)#', function ($matches) {
+            return '<?php if(' . $matches[1] . '): ?>';
+        }, $template);
+
+        // Replace `@endif` with `endif`
+        $template = preg_replace_callback('#@endif#', function ($matches) {
+            return '<?php endif; ?>';
+        }, $template);
+
+        // Replace `{{ ... }}` with `print $this->escape(...)`
+        $template = preg_replace_callback('#\{\{([^}]+)\}\}#', function ($matches) {
+            return '<?php print $this->escape("' . $matches[1] . '"); ?>';
+        }, $template);
+
+        $template = preg_replace_callback('#\{!!([^}]+)!!\}#', function ($matches) {
+            return '<?php print "' . $matches[1] . '"; ?>';
         }, $template);
 
         return $template;

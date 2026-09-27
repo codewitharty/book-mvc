@@ -35,7 +35,7 @@ if (!function_exists('view')) {
             $manager->addEngine('advanced.php', new View\Engine\AdvancedEngine());
             $manager->addEngine('php', new View\Engine\PhpEngine());
 
-            $manager->addMacro('escape', fn($value) => htmlspecialchars($value));
+            $manager->addMacro('escape', fn($value) => trim(htmlspecialchars($value)));
             $manager->addMacro('includes', fn(...$params) => print view(...$params));
         }
 
