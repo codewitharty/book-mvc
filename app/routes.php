@@ -1,12 +1,13 @@
 <?php
 
+use App\Http\Controllers\ListProductsController;
 use Framework\Routing\Router;
 
 return function (Router $router) {
     $router->add(
         'GET', '/',
-        fn() => view('products/list', ['number' => 42]),
-    );
+        [new ListProductsController($router), 'handle'],
+    )->name('show-home-page');
 
     $router->add(
         'GET', '/old-home',
@@ -22,6 +23,11 @@ return function (Router $router) {
         'GET', '/has-validation-error',
         fn() => $router->dispatchNotAllowed(),
     );
+
+    $router->add(
+        'GET', '/products/{page?}',
+        [new ListProductsController($router), 'handle'],
+    )->name('list-products');
 
     $router->add(
         'GET', '/products/view/{product}',

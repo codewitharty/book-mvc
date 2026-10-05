@@ -11,5 +11,9 @@
   },
   "config": {
     "process-timeout": 0
+  },
+  "require": {
+    "filp/whoops": "^2.18",
+    "vlucas/phpdotenv": "^5.7"
   }
 }

@@ -24,12 +24,12 @@ class Route
      *
      * @param string $method The HTTP method for this route.
      * @param string $path The URL pattern to match.
-     * @param callable $handler The callback function to invoke on match.
+     * @param $handler `The callback function to invoke on match.
      */
     public function __construct(
         string   $method,
         string   $path,
-        callable $handler
+        $handler
     )
     {
         // Set the HTTP method for this route instance.
@@ -157,6 +157,15 @@ class Route
      */
     public function dispatch()
     {
+        if (is_array($this->handler)) {
+            [$class, $method] = $this->handler;
+
+            if (is_string($class)) {
+                return (new $class)->{$method}();
+            }
+
+            return $class->{$method}();
+        }
         // Execute the stored callable handler using call_user_func(). This runs the actual logic associated with this route when it matches a request.
         return call_user_func($this->handler);
     }

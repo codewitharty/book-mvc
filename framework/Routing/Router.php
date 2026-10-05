@@ -4,6 +4,8 @@ namespace Framework\Routing;
 
 use Exception;
 use Throwable;
+use Whoops\Handler\PrettyPageHandler;
+use Whoops\Run;
 
 /**
  * Manages routing by collecting defined routes and handling incoming requests.
@@ -22,13 +24,13 @@ class Router
      *
      * @param string $method The HTTP method for this route (e.g., GET, POST).
      * @param string $path The URL pattern to match against incoming requests.
-     * @param callable $handler The callback function invoked when the route matches.
+     * @param $handler `The callback function invoked when the route matches.
      * @return Route Returns the newly created Route instance.
      */
     public function add(
         string   $method,
         string   $path,
-        callable $handler
+        $handler
     ): Route
     {
         // Create a new Route object using the provided method, path pattern, and handler callback.
@@ -42,6 +44,7 @@ class Router
 
     /**
      * Dispatches an incoming request to the appropriate route handler.
+     * @throws Throwable
      */
     public function dispatch()
     {
@@ -64,7 +67,13 @@ class Router
                 // Attempt to execute the handler function of the matched route. This action might throw an exception if the handler fails internally.
                 return $matching->dispatch(); // Return the result from the successful route dispatch.
             } catch (Throwable $e) {
-                return $e;
+                if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'dev') {
+                    $whoops = new Run();
+                    $whoops->pushHandler(new PrettyPageHandler());
+                    $whoops->register();
+                    throw $e;
+                }
+
                 // If any Throwable (Exception or Error) occurs during dispatch, we catch it here instead of letting it crash the application immediately.
                 return $this->dispatchError(); // Delegate error handling to our global 500 handler.
             }
